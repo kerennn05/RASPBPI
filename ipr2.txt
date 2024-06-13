@@ -1,0 +1,29 @@
+!# Import the picture
+pics = ["pic/object.png"]
+
+for pic in pics:
+    print("=" * 79)
+    print("File:", pic)
+    display(Image(pic, width = 500))
+    
+    with io.open(pic, "rb") as image_file:
+        parse = image_file.read()
+    
+    query = {"image": {"content": parse},
+             "features": [{"type_": "OBJECT_LOCALIZATION"}]}
+    
+    response = client.annotate_image(query)
+
+    # Object Localization detection
+    objects = response.localized_object_annotations
+    if objects:
+        print("Number of objects found: {}".format(len(objects)))
+        for obj in objects:
+            print("{} (Confidence: {})".format(obj.name, obj.score))
+            print("  Normalized bounding polygon vertices: ")
+            for vertex in obj.bounding_poly.normalized_vertices:
+                print("  • ({}, {})".format(vertex.x, vertex.y))
+    else:
+        print("[None]")
+===============================================================================
+File: pic/object.png

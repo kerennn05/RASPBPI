@@ -1,0 +1,30 @@
+# Import the picture
+pics = ["pic/text.png"]
+
+for pic in pics:
+    print("=" * 79)
+    print("File:", pic)
+    display(Image(pic, width = 500))
+    
+    with io.open(pic, "rb") as image_file:
+        parse = image_file.read()
+    
+    query = {"image": {"content": parse},
+             "features": [{"type_": "TEXT_DETECTION"}]}
+    
+    response = client.annotate_image(query)
+
+    # Text detection
+    texts = response.text_annotations
+    print("Texts:")
+    if texts:
+        for text in texts:
+            print("\"{}\"".format(text.description))
+            vertices = (["({},{})".format(vertex.x, vertex.y)
+                        for vertex in text.bounding_poly.vertices])
+            print("  • Text Bounds: {}".format(", ".join(vertices)))
+        print("\n")
+    else:
+        print("[None]", end = "\n\n")
+===============================================================================
+File: pic/text.png
